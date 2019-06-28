@@ -1,3 +1,4 @@
+import copy
 import re
 
 Romans={"I":1,"II":2,"III":3,"IV":4,"V":5,"VI":6,"VII":7,"VIII":8,"IX":9,\
@@ -89,41 +90,197 @@ def OtherToNum(tnum,table):
 
 def token(num_a):
     cnt=1
-    last_alpha='!'
     rst=[[num_a[0],1]]
     rst_ptr=0
-    for i in range(1,len(num_a)-1):
+    for i in range(1,len(num_a)):
         if num_a[i]==rst[rst_ptr][0]:
-            rst[rst_ptr][0]+=1
+            rst[rst_ptr][1]+=1
         else:
             rst.append([num_a[i],1])
             rst_ptr+=1
     return rst
 
-in_str=input("How can I help you?")
-pattern=r"[Pp]lease convert (\d+|[a-zA-Z]+)(?: |$)(?:minimally|(?:(?:using )([a-zA-Z]+))$){0,1}"
-rst=re.fullmatch(pattern,in_str)
-if rst!=None:
-    if "using" in in_str:
-        ans=""
-        if re.match(r"\d+",rst.group(1)):
-            ans=NumToOther(rst.group(1),rst.group(2))
-        else:
-            ans=str(OtherToNum(rst.group(1),rst.group(2)))
-        print("Sure! It is "+ans)
-    elif "minimally" in in_str:
-        pass
-    else:
-        # N to R
-        if re.match(r"\d+",rst.group(1)):
-           print(NumToRoman(rst.group(1))) 
-        # R to N    
-        elif re.match(r"\w+",rst.group(1)):
-            Rstr=rst.group(1).upper()
-            ans=RomanToNum(Rstr)
-            if ans!=None:
-                print("Sure! It is "+str(ans))
+def dfs(ans,depth,token_list,rst):
+    if depth>=len(token_list):
+        if test_num(ans):
+            tmp=""
+            for w in ans:
+                for i in w:
+                    for k in range(i[1]):
+                        tmp+=i[0]
+                tmp+=' '
+            rst.append(copy.deepcopy(ans))
+            print(rst)
+        return
+    for i in range(1,3):
+        if i==1:
+            ans.append([token_list[depth]])
+            dfs(ans,depth+1,token_list,rst)
+            ans.pop()
+        elif i==2:
+            if depth+1<len(token_list):
+                ans.append([token_list[depth],token_list[depth+1]])
+                dfs(ans,depth+2,token_list,rst)
+                ans.pop()
+    return
+
+
+
+
+def test_num(dfs_rst):
+    for w in dfs_rst:
+        if len(w)==2:
+            if w[0][1]>1:
+                return False
+    return True
+
+
+
+def dfs_solve(ans,num,depth,dfs_list,bt_list):
+    if depth==-1:
+        bt_list.append(ans)
+        table=""
+        new_ans={v:k for k,v in ans.items()}
+        for i in range(len(dfs_list)):
+            if new_ans.get(1*(10**i))!=None:
+                table=new_ans[1*(10**i)]+table
             else:
-                print("Hey, ask me something that's not impossible to do!")
-else:
-    print("I don't get what you want, sorry mate!")
+                table='_'+table
+            if new_ans.get(5*(10**i))!=None:
+                table=new_ans[5*(10**i)]+table
+            else:
+                table='_'+table
+        print(table)
+        print(num)
+        return
+    wei=dfs_list[depth]
+    wei_w=10**(len(dfs_list)-depth-1)
+    if len(wei)==1:
+        if wei[0][1]==1:
+            if ans.get(wei[0][0])!=None:
+                return;
+            ans[wei[0][0]]=1*wei_w
+            num+=1*wei_w
+            dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+            del ans[wei[0][0]]
+            num-=1*wei_w
+            if ans.get(wei[0][0])!=None:
+                return;
+            ans[wei[0][0]]=5*wei_w
+            num+=5*wei_w
+            dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+            del ans[wei[0][0]]
+            num-=5*wei_w
+        else:
+            if ans.get(wei[0][0])!=None:
+                return;
+            ans[wei[0][0]]=1*wei_w
+            num+=1*wei_w
+            dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+            del ans[wei[0][0]]
+            num-=1*wei_w
+    else:
+        if wei[0][1]==1 and wei[1][1]==1:
+            for i in range(1,4):
+                if i==1:
+                    #+1
+                    if ans.get(wei[0][1])!=None or ans.get(wei[0][1])!=None:
+                        return;
+                    ans[wei[0][0]]=5*wei_w
+                    ans[wei[1][0]]=1*wei_w
+                    num+=5*wei_w+1*wei_w
+                    dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                    del ans[wei[0][0]]
+                    del ans[wei[1][0]]
+                    num-=5*wei_w+1*wei_w
+                elif i==2:
+                    #-1
+                    if ans.get(wei[0][1])!=None or ans.get(wei[0][1])!=None:
+                        return;
+                    ans[wei[0][0]]=1*wei_w
+                    ans[wei[1][0]]=5*wei_w
+                    num+=5*wei_w-1*wei_w
+                    dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                    del ans[wei[0][0]]
+                    del ans[wei[1][0]]
+                    num-=5*wei_w-1*wei_w
+                elif i==3:
+                    if ans.get(wei[0][1])!=None or ans.get(wei[0][1])!=None:
+                        return;
+                    ans[wei[0][0]]=1*wei_w
+                    ans[wei[1][0]]=10*wei_w
+                    num+=10*wei_w-1*wei_w
+                    dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                    del ans[wei[0][0]]
+                    del ans[wei[1][0]]
+                    num-=10*wei_w-1*wei_w
+        elif wei[0][1]==1 and wei[1][1]>1:
+            if ans.get(wei[0][1])!=None or ans.get(wei[0][1])!=None:
+                return;
+            ans[wei[0][0]]=5*wei_w
+            ans[wei[1][0]]=1*wei_w
+            num+=5*wei_w+1*wei_w*wei[1][1]
+            dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+            del ans[wei[0][0]]
+            del ans[wei[1][0]]
+            num-=5*wei_w+1*wei_w*wei[1][1]
+    return
+            
+
+
+def solve(num_a):
+    token_list=token(num_a)
+    dfs_rst=[]
+    dfs([],0,token_list,dfs_rst)
+    bt_list=[]
+    for right_patten in dfs_rst:
+        dfs_solve([],len(right_patten)-1,right_patten,bt_list)
+    minn=0x7f7f7f
+    rst_ptr=-1
+    for i in range(len(bt_list)):
+        if minn>bt_list[i][0]:
+            minn=bt_list[i][0]
+            rst_ptr=i
+    print(bt_list[rst_ptr][0],bt_list[rst_ptr][1])
+
+def main(): 
+    num="MMMVII"
+    token_list=token(num)
+    dfs_rst=[]
+    bt_list=[]
+    dfs([],0,token_list,dfs_rst)
+    print(dfs_rst)
+    for element in dfs_rst:
+        dfs_solve({},0,len(element)-1,element,bt_list)
+
+if __name__ == '__main__':
+    main()
+
+
+#in_str=input("How can I help you?")
+#pattern=r"[Pp]lease convert (\d+|[a-zA-Z]+)(?: |$)(?:minimally|(?:(?:using )([a-zA-Z]+))$){0,1}"
+#rst=re.fullmatch(pattern,in_str)
+#if rst!=None:
+#    if "using" in in_str:
+#        ans=""
+#        if re.match(r"\d+",rst.group(1)):
+#            ans=NumToOther(rst.group(1),rst.group(2))
+#        else:
+#            ans=str(OtherToNum(rst.group(1),rst.group(2)))
+#        print("Sure! It is "+ans)
+#    elif "minimally" in in_str:
+#        pass
+#    else:
+#        # N to R
+#        if re.match(r"\d+",rst.group(1)):
+#           print(NumToRoman(rst.group(1))) 
+#        # R to N    
+#        elif re.match(r"\w+",rst.group(1)):
+#            Rstr=rst.group(1).upper()
+#            ans=RomanToNum(Rstr)
+#            if ans!=None:
+#                print("Sure! It is "+str(ans))
+#            else:
+#                print("Hey, ask me something that's not impossible to do!")
+#else:
+#    print("I don't get what you want, sorry mate!")
