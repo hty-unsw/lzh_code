@@ -87,6 +87,19 @@ def OtherToNum(tnum,table):
         last_loc=loc
     return ans
 
+def token(num_a):
+    cnt=1
+    last_alpha='!'
+    rst=[[num_a[0],1]]
+    rst_ptr=0
+    for i in range(1,len(num_a)-1):
+        if num_a[i]==rst[rst_ptr][0]:
+            rst[rst_ptr][0]+=1
+        else:
+            rst.append([num_a[i],1])
+            rst_ptr+=1
+    return rst
+
 in_str=input("How can I help you?")
 pattern=r"[Pp]lease convert (\d+|[a-zA-Z]+)(?: |$)(?:minimally|(?:(?:using )([a-zA-Z]+))$){0,1}"
 rst=re.fullmatch(pattern,in_str)
