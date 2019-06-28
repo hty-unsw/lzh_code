@@ -1,0 +1,28 @@
+MDCCLXXXIX 1789
+M DCC LXXX I X
+M D CC L XXX I X
+
+MMMVII 	37
+
+VI 4
+
+ABCADDEFGF 49269
+BA_C_DEF_G
+A B C A DD E F G F
+A B C ADD E F G F
+
+ABCADDEFGF
+
+ABCCED 1719
+
+能出现多次的数字的特征：
+1、只能是权重为1
+2、如果是和其他数字配合的情况，只能在其他符号的右侧表示相加，相配合的那个符号代表权重为5
+3、从左往右看，如果已经出现过一次了，那么这个符号代表和第一次出现位置的配合符号阶数相同的权重1
+
+猜测顺序：
+1、从左往右
+2、一位一位进行
+3、单个符合组成？两个符号组成？
+3、
+
