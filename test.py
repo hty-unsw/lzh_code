@@ -110,7 +110,6 @@ def dfs(ans,depth,token_list,rst):
                         tmp+=i[0]
                 tmp+=' '
             rst.append(copy.deepcopy(ans))
-            print(rst)
         return
     for i in range(1,3):
         if i==1:
@@ -125,8 +124,6 @@ def dfs(ans,depth,token_list,rst):
     return
 
 
-
-
 def test_num(dfs_rst):
     for w in dfs_rst:
         if len(w)==2:
@@ -135,10 +132,8 @@ def test_num(dfs_rst):
     return True
 
 
-
 def dfs_solve(ans,num,depth,dfs_list,bt_list):
     if depth==-1:
-        bt_list.append(copy.deepcopy(ans))
         table=""
         new_ans={v:k for k,v in ans.items()}
         for i in range(len(dfs_list)):
@@ -150,100 +145,188 @@ def dfs_solve(ans,num,depth,dfs_list,bt_list):
                 table=new_ans[5*(10**i)]+table
             else:
                 table='_'+table
-        print(table)
-        print(num)
+        bt_list.append([copy.deepcopy(table),copy.deepcopy(num)])
         return
     wei=dfs_list[depth]
     wei_w=10**(len(dfs_list)-depth-1)
     if len(wei)==1:
         if ans.get(wei[0][0])!=None:
+            if ans[wei[0][0]]<wei_w:
+                return
             if wei[0][1]==1:
-                pass
+                for tmp in [1,5]:
+                    num+=tmp*wei_w
+                    dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                    num-=tmp*wei_w
+            else:
+                num+=1*wei_w*wei[0][1]
+                dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                num-=1*wei_w*wei[0][1]
         else:
             if wei[0][1]==1:
-                ans[wei[0][0]]=1*wei_w
-                num+=1*wei_w
-                dfs_solve(ans,num,depth-1,dfs_list,bt_list)
-                del ans[wei[0][0]]
-                num-=1*wei_w
-                
-                ans[wei[0][0]]=5*wei_w
-                num+=5*wei_w
-                dfs_solve(ans,num,depth-1,dfs_list,bt_list)
-                del ans[wei[0][0]]
-                num-=5*wei_w
+                for tmp in [1,5]:
+                    ans[wei[0][0]]=tmp*wei_w
+                    num+=tmp*wei_w
+                    dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                    del ans[wei[0][0]]
+                    num-=tmp*wei_w
             else:
                 ans[wei[0][0]]=1*wei_w
-                num+=1*wei_w
+                num+=1*wei_w*wei[0][1]
                 dfs_solve(ans,num,depth-1,dfs_list,bt_list)
                 del ans[wei[0][0]]
-                num-=1*wei_w
+                num-=1*wei_w*wei[0][1]
     else:
-        if ans.get(wei[0][0])!=None or ans.get(wei[1][0])!=None:
-            return
+        if ans.get(wei[0][0])!=None and ans.get(wei[1][0])==None:
+            if ans[wei[0][0]]<wei_w:
+                return
+            if wei[0][1]==1 and wei[1][1]==1:
+                if ans[wei[0][0]]==1*wei_w:
+                    #4
+                    ans[wei[1][0]]=5*wei_w
+                    num+=(5*wei_w-1*wei_w)
+                    dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                    num-=(5*wei_w-1*wei_w)
+                    del ans[wei[1][0]]
+                elif ans[wei[0][0]]==5*wei_w:
+                    #6
+                    ans[wei[1][0]]=1*wei_w
+                    num+=(5*wei_w+1*wei_w)
+                    dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                    num-=(5*wei_w+1*wei_w)
+                    del ans[wei[1][0]]
 
-        if wei[0][1]==1 and wei[1][1]==1:
-            #+1
-            ans[wei[0][0]]=5*wei_w
-            ans[wei[1][0]]=1*wei_w
-            num+=5*wei_w+1*wei_w
-            dfs_solve(ans,num,depth-1,dfs_list,bt_list)
-            del ans[wei[0][0]]
-            del ans[wei[1][0]]
-            num-=5*wei_w+1*wei_w
+                    #9
+                    ans[wei[1][0]]=10*wei_w
+                    num+=(10*wei_w-1*wei_w)
+                    dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                    num-=(10*wei_w-1*wei_w)
+                    del ans[wei[1][0]]
 
-            #-1
-            ans[wei[0][0]]=1*wei_w
-            ans[wei[1][0]]=5*wei_w
-            num+=5*wei_w-1*wei_w
-            dfs_solve(ans,num,depth-1,dfs_list,bt_list)
-            del ans[wei[0][0]]
-            del ans[wei[1][0]]
-            num-=5*wei_w-1*wei_w
+            elif wei[0][1]==1 and wei[1][1]>1:
+                if ans[wei[0][0]]==1*wei_w:
+                    return
+                ans[wei[1][0]]=5*wei_w
+                num+=(5*wei_w+1*wei_w*wei[1][1])
+                dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                num-=(5*wei_w+1*wei_w*wei[1][1])
+                del ans[wei[1][0]]
+            
+        elif ans.get(wei[0][0])==None and ans.get(wei[1][0])!=None:
+            if ans[wei[1][0]]<wei_w:
+                return
+            if wei[0][1]==1 and wei[1][1]==1:
+                if ans[wei[1][0]]==1*wei_w:
+                    #6
+                    ans[wei[0][0]]=5*wei_w
+                    num+=(5*wei_w+1*wei_w)
+                    dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                    num-=(5*wei_w+1*wei_w)
+                    del ans[wei[0][0]]
+                elif ans[wei[1][0]]==5*wei_w:
+                    #4
+                    ans[wei[0][0]]=1*wei_w
+                    num+=(5*wei_w-1*wei_w)
+                    dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                    num-=(5*wei_w-1*wei_w)
+                    del ans[wei[0][0]]
 
-            ans[wei[0][0]]=1*wei_w
-            ans[wei[1][0]]=10*wei_w
-            num+=10*wei_w-1*wei_w
-            dfs_solve(ans,num,depth-1,dfs_list,bt_list)
-            del ans[wei[0][0]]
-            del ans[wei[1][0]]
-            num-=10*wei_w-1*wei_w
-        elif wei[0][1]==1 and wei[1][1]>1:
-            ans[wei[0][0]]=5*wei_w
-            ans[wei[1][0]]=1*wei_w
-            num+=5*wei_w+1*wei_w*wei[1][1]
-            dfs_solve(ans,num,depth-1,dfs_list,bt_list)
-            del ans[wei[0][0]]
-            del ans[wei[1][0]]
-            num-=5*wei_w+1*wei_w*wei[1][1]
+            elif wei[0][1]==1 and wei[1][1]>1:
+                if ans[wei[1][0]]==5*wei_w:
+                    return
+                ans[wei[0][0]]=5*wei_w
+                num+=(5*wei_w+1*wei_w*wei[1][1])
+                dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                num-=(5*wei_w+1*wei_w*wei[1][1])
+                del ans[wei[0][0]]
+
+        elif ans.get(wei[0][0])!=None and ans.get(wei[1][0])!=None:
+            if ans[wei[0][0]]<wei_w or ans[wei[1][0]]<wei_w:
+                return
+            if ans[wei[0][0]]==5*wei_w and ans[wei[1][0]]==5*wei_w:
+                return
+            if wei[0][1]==1 and wei[1][1]==1:
+                if ans[wei[0][0]]==5*wei_w and ans[wei[1][0]]==1*wei_w:
+                    #6
+                    num+=(5*wei_w+1*wei_w)
+                    dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                    num-=(5*wei_w+1*wei_w)
+
+                elif ans[wei[0][0]]==1*wei_w and ans[wei[1][0]]==5*wei_w:
+                    #4
+                    num+=(5*wei_w-1*wei_w)
+                    dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                    num-=(5*wei_w-1*wei_w)
+
+            elif wei[0][1]==1 and wei[1][1]>1:
+                if ans[wei[1][0]]!=1*wei_w:
+                    return;
+                num+=(5*wei_w+1*wei_w*wei[1][1])
+                dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                num-=(5*wei_w+1*wei_w*wei[1][1])
+
+        elif ans.get(wei[0][0])==None and ans.get(wei[1][0])==None:
+            if wei[0][1]==1 and wei[1][1]==1:
+                #6
+                ans[wei[0][0]]=5*wei_w
+                ans[wei[1][0]]=1*wei_w
+                num+=(5*wei_w+1*wei_w)
+                dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                del ans[wei[0][0]]
+                del ans[wei[1][0]]
+                num-=(5*wei_w+1*wei_w)
+
+                #4
+                ans[wei[0][0]]=1*wei_w
+                ans[wei[1][0]]=5*wei_w
+                num+=(5*wei_w-1*wei_w)
+                dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                del ans[wei[0][0]]
+                del ans[wei[1][0]]
+                num-=(5*wei_w-1*wei_w)
+
+                #9
+                ans[wei[0][0]]=1*wei_w
+                ans[wei[1][0]]=10*wei_w
+                num+=(10*wei_w-1*wei_w)
+                dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                del ans[wei[0][0]]
+                del ans[wei[1][0]]
+                num-=(10*wei_w-1*wei_w)
+
+            elif wei[0][1]==1 and wei[1][1]>1:
+                ans[wei[0][0]]=5*wei_w
+                ans[wei[1][0]]=1*wei_w
+                num+=(5*wei_w+1*wei_w*wei[1][1])
+                dfs_solve(ans,num,depth-1,dfs_list,bt_list)
+                del ans[wei[0][0]]
+                del ans[wei[1][0]]
+                num-=(5*wei_w+1*wei_w*wei[1][1])
     return
             
 
-
-def solve(num_a):
-    token_list=token(num_a)
-    dfs_rst=[]
-    dfs([],0,token_list,dfs_rst)
-    bt_list=[]
-    for right_patten in dfs_rst:
-        dfs_solve([],len(right_patten)-1,right_patten,bt_list)
-    minn=0x7f7f7f
-    rst_ptr=-1
-    for i in range(len(bt_list)):
-        if minn>bt_list[i][0]:
-            minn=bt_list[i][0]
-            rst_ptr=i
-    print(bt_list[rst_ptr][0],bt_list[rst_ptr][1])
-
-def main(): 
-    num="ABCCDED"
+def solve(num): 
     token_list=token(num)
     dfs_rst=[]
     bt_list=[]
     dfs([],0,token_list,dfs_rst)
-    print(dfs_rst)
     for element in dfs_rst:
         dfs_solve({},0,len(element)-1,element,bt_list)
+    print("____________________")
+    for element in bt_list:
+        print(element[0]+":"+str(element[1]))
+    minn=0x7f7f7f
+    rst_ptr=-1
+    for i in range(len(bt_list)):
+        if minn>bt_list[i][1]:
+            minn=bt_list[i][1]
+            rst_ptr=i
+    print(bt_list[rst_ptr][0],bt_list[rst_ptr][1])
+
+def main():
+    num_list=["MDCCLXXXVII","MDCCLXXXIX","MMMVII","VI","ABCADDEFGF","ABCCDED"]
+    for i in num_list:
+        solve(i)
 
 if __name__ == '__main__':
     main()
