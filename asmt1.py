@@ -426,51 +426,47 @@ def solve(num):
 
 ###############################################################################################
 #main
-import fileinput
 
-def main():
-    f_in=fileinput.input()
-    for in_str in f_in:
-        in_str=in_str[:-1]
-        #in_str=input("How can I help you?")
-        pattern=r"Please convert ([_0-9a-zA-Z]+)(?: |$)(?:minimally|(?:(?:using )([a-zA-Z]+|_))$){0,1}"
-        rst=re.fullmatch(pattern,in_str)
-        if rst!=None:
-            ans=""
-            try:
-                #Using 
-                if "using" in in_str:
-                    if re.fullmatch(r"\d+",rst.group(1)):
-                        ans=NumToGRomans(rst.group(1),rst.group(2))
-                    elif re.fullmatch(r"[a-zA-Z_]+",rst.group(1)):
-                        ans=str(GRomansToNum(rst.group(1),rst.group(2)))
-                    else:
-                        raise error("error")
-                #minimally
-                elif "minimally" in in_str:
-                    if re.fullmatch(r"[a-zA-Z_]+",rst.group(1)):
-                        ans=solve(rst.group(1))
-                        ans=str(ans[1])+" using "+ans[0]
-                    else:
-                        raise error("error")
-                #others
+def please_convert():
+    in_str=input("How can I help you?")
+    print("I'll think about it ...")
+    pattern=r"Please convert ([_0-9a-zA-Z]+)(?: |$)(?:minimally|(?:(?:using )([a-zA-Z]+|_))$){0,1}"
+    rst=re.fullmatch(pattern,in_str)
+    if rst!=None:
+        ans=""
+        try:
+            #Using 
+            if "using" in in_str:
+                if re.fullmatch(r"\d+",rst.group(1)):
+                    ans=NumToGRomans(rst.group(1),rst.group(2))
+                elif re.fullmatch(r"[a-zA-Z_]+",rst.group(1)):
+                    ans=str(GRomansToNum(rst.group(1),rst.group(2)))
                 else:
-                    # N to R
-                    if re.fullmatch(r"\d+",rst.group(1)):
-                        ans=NumToRomans(rst.group(1))
-                    # R to N    
-                    elif re.fullmatch(r"[a-zA-Z_]+",rst.group(1)):
-                        Rstr=rst.group(1).upper()
-                        ans=RomansToNum(Rstr)
-                        ans=str(ans)
-                    else:
-                        raise error("error")
-                print("Sure! It is "+ans)
-            except error as n:
-                #print(n.msg)
-                print("Hey, ask me something that's not impossible to do!")
-        else:
-            print("I don't get what you want, sorry mate!")
+                    raise error("error")
+            #minimally
+            elif "minimally" in in_str:
+                if re.fullmatch(r"[a-zA-Z_]+",rst.group(1)):
+                    ans=solve(rst.group(1))
+                    ans=str(ans[1])+" using "+ans[0]
+                else:
+                    raise error("error")
+            #others
+            else:
+                # N to R
+                if re.fullmatch(r"\d+",rst.group(1)):
+                    ans=NumToRomans(rst.group(1))
+                # R to N    
+                elif re.fullmatch(r"[a-zA-Z_]+",rst.group(1)):
+                    Rstr=rst.group(1).upper()
+                    ans=RomansToNum(Rstr)
+                    ans=str(ans)
+                else:
+                    raise error("error")
+            print("Sure! It is "+ans)
+        except error as n:
+            #print(n.msg)
+            print("Hey, ask me something that's not impossible to do!")
+    else:
+        print("I don't get what you want, sorry mate!")
 
-if __name__ == '__main__':
-    main()
+please_convert()
